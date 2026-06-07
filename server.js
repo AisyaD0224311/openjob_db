@@ -14,7 +14,6 @@ const applicationService = require('./services/ApplicationServices');
 const bookmarkService = require('./services/BookmarkServices');
 const documentService = require('./services/DocumentServices');
 
-// Validators
 const { UserPayloadSchema } = require('./validator/UserValidator');
 const { AuthPayloadSchema } = require('./validator/AuthValidator');
 const { CompanyPayloadSchema } = require('./validator/CompanyValidator');
@@ -22,7 +21,6 @@ const { CategoryPayloadSchema } = require('./validator/CategoryValidator');
 const { JobPayloadSchema } = require('./validator/JobValidator');
 const { ApplicationPayloadSchema, ApplicationStatusSchema } = require('./validator/ApplicationValidator');
 
-// Middleware
 const validationMiddleware = require('./middleware/ValidationMiddleware');
 const authMiddleware = require('./middleware/AuthMiddleware');
 const upload = require('./middleware/UploadMiddleware');
@@ -30,11 +28,6 @@ const upload = require('./middleware/UploadMiddleware');
 const app = express();
 app.use(express.json());
 
-// ─────────────────────────────────────────────
-// USERS
-// ─────────────────────────────────────────────
-
-// POST /users – Register
 app.post('/users', validationMiddleware(UserPayloadSchema), async (req, res, next) => {
   try {
     const userId = await userService.addUser(req.body);
@@ -48,7 +41,6 @@ app.post('/users', validationMiddleware(UserPayloadSchema), async (req, res, nex
   }
 });
 
-// GET /users/:id – Get user by ID (public)
 app.get('/users/:id', async (req, res, next) => {
   try {
     const query = {
@@ -67,11 +59,6 @@ app.get('/users/:id', async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// AUTHENTICATIONS
-// ─────────────────────────────────────────────
-
-// POST /authentications – Login
 app.post('/authentications', validationMiddleware(AuthPayloadSchema), async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -88,7 +75,6 @@ app.post('/authentications', validationMiddleware(AuthPayloadSchema), async (req
   }
 });
 
-// PUT /authentications – Refresh token
 app.put('/authentications', async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
@@ -117,7 +103,6 @@ app.put('/authentications', async (req, res, next) => {
   }
 });
 
-// DELETE /authentications – Logout
 app.delete('/authentications', async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
@@ -128,11 +113,6 @@ app.delete('/authentications', async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// COMPANIES
-// ─────────────────────────────────────────────
-
-// GET /companies – List all (public)
 app.get('/companies', async (req, res, next) => {
   try {
     const companies = await companyService.getAllCompanies();
@@ -142,7 +122,6 @@ app.get('/companies', async (req, res, next) => {
   }
 });
 
-// GET /companies/:id – Detail (public)
 app.get('/companies/:id', async (req, res, next) => {
   try {
     const company = await companyService.getCompanyById(req.params.id);
@@ -152,7 +131,6 @@ app.get('/companies/:id', async (req, res, next) => {
   }
 });
 
-// POST /companies – Create (protected)
 app.post('/companies', authMiddleware, validationMiddleware(CompanyPayloadSchema), async (req, res, next) => {
   try {
     const companyId = await companyService.addCompany(req.body);
@@ -166,7 +144,6 @@ app.post('/companies', authMiddleware, validationMiddleware(CompanyPayloadSchema
   }
 });
 
-// PUT /companies/:id – Update (protected)
 app.put('/companies/:id', authMiddleware, validationMiddleware(CompanyPayloadSchema), async (req, res, next) => {
   try {
     await companyService.updateCompany(req.params.id, req.body);
@@ -176,7 +153,6 @@ app.put('/companies/:id', authMiddleware, validationMiddleware(CompanyPayloadSch
   }
 });
 
-// DELETE /companies/:id – Delete (protected)
 app.delete('/companies/:id', authMiddleware, async (req, res, next) => {
   try {
     await companyService.deleteCompany(req.params.id);
@@ -186,11 +162,6 @@ app.delete('/companies/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// CATEGORIES
-// ─────────────────────────────────────────────
-
-// GET /categories – List all (public)
 app.get('/categories', async (req, res, next) => {
   try {
     const categories = await categoryService.getAllCategories();
@@ -200,7 +171,6 @@ app.get('/categories', async (req, res, next) => {
   }
 });
 
-// GET /categories/:id – Detail (public)
 app.get('/categories/:id', async (req, res, next) => {
   try {
     const category = await categoryService.getCategoryById(req.params.id);
@@ -210,7 +180,6 @@ app.get('/categories/:id', async (req, res, next) => {
   }
 });
 
-// POST /categories – Create (protected)
 app.post('/categories', authMiddleware, validationMiddleware(CategoryPayloadSchema), async (req, res, next) => {
   try {
     const categoryId = await categoryService.addCategory(req.body);
@@ -224,7 +193,6 @@ app.post('/categories', authMiddleware, validationMiddleware(CategoryPayloadSche
   }
 });
 
-// PUT /categories/:id – Update (protected)
 app.put('/categories/:id', authMiddleware, validationMiddleware(CategoryPayloadSchema), async (req, res, next) => {
   try {
     await categoryService.updateCategory(req.params.id, req.body);
@@ -234,7 +202,6 @@ app.put('/categories/:id', authMiddleware, validationMiddleware(CategoryPayloadS
   }
 });
 
-// DELETE /categories/:id – Delete (protected)
 app.delete('/categories/:id', authMiddleware, async (req, res, next) => {
   try {
     await categoryService.deleteCategory(req.params.id);
@@ -244,11 +211,6 @@ app.delete('/categories/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// JOBS
-// ─────────────────────────────────────────────
-
-// GET /jobs – List all with optional search (public)
 app.get('/jobs', async (req, res, next) => {
   try {
     const { title, 'company-name': companyName } = req.query;
@@ -259,8 +221,6 @@ app.get('/jobs', async (req, res, next) => {
   }
 });
 
-// GET /jobs/company/:companyId – Jobs by company (public)
-// NOTE: must be defined BEFORE /jobs/:id to avoid conflict
 app.get('/jobs/company/:companyId', async (req, res, next) => {
   try {
     const jobs = await jobService.getJobsByCompany(req.params.companyId);
@@ -270,7 +230,6 @@ app.get('/jobs/company/:companyId', async (req, res, next) => {
   }
 });
 
-// GET /jobs/category/:categoryId – Jobs by category (public)
 app.get('/jobs/category/:categoryId', async (req, res, next) => {
   try {
     const jobs = await jobService.getJobsByCategory(req.params.categoryId);
@@ -280,7 +239,6 @@ app.get('/jobs/category/:categoryId', async (req, res, next) => {
   }
 });
 
-// GET /jobs/:id – Detail (public)
 app.get('/jobs/:id', async (req, res, next) => {
   try {
     const job = await jobService.getJobById(req.params.id);
@@ -290,7 +248,6 @@ app.get('/jobs/:id', async (req, res, next) => {
   }
 });
 
-// POST /jobs – Create (protected)
 app.post('/jobs', authMiddleware, validationMiddleware(JobPayloadSchema), async (req, res, next) => {
   try {
     const jobId = await jobService.addJob(req.body);
@@ -304,7 +261,6 @@ app.post('/jobs', authMiddleware, validationMiddleware(JobPayloadSchema), async 
   }
 });
 
-// PUT /jobs/:id – Update (protected)
 app.put('/jobs/:id', authMiddleware, validationMiddleware(JobPayloadSchema), async (req, res, next) => {
   try {
     await jobService.updateJob(req.params.id, req.body);
@@ -314,7 +270,6 @@ app.put('/jobs/:id', authMiddleware, validationMiddleware(JobPayloadSchema), asy
   }
 });
 
-// DELETE /jobs/:id – Delete (protected)
 app.delete('/jobs/:id', authMiddleware, async (req, res, next) => {
   try {
     await jobService.deleteJob(req.params.id);
@@ -324,11 +279,6 @@ app.delete('/jobs/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// APPLICATIONS (all protected)
-// ─────────────────────────────────────────────
-
-// POST /applications – Apply for a job
 app.post('/applications', authMiddleware, validationMiddleware(ApplicationPayloadSchema), async (req, res, next) => {
   try {
     const { job_id } = req.body;
@@ -343,7 +293,6 @@ app.post('/applications', authMiddleware, validationMiddleware(ApplicationPayloa
   }
 });
 
-// GET /applications – List all applications
 app.get('/applications', authMiddleware, async (req, res, next) => {
   try {
     const applications = await applicationService.getAllApplications();
@@ -353,7 +302,6 @@ app.get('/applications', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET /applications/user/:userId – Applications by user
 app.get('/applications/user/:userId', authMiddleware, async (req, res, next) => {
   try {
     const applications = await applicationService.getApplicationsByUser(req.params.userId);
@@ -363,7 +311,6 @@ app.get('/applications/user/:userId', authMiddleware, async (req, res, next) => 
   }
 });
 
-// GET /applications/job/:jobId – Applications by job
 app.get('/applications/job/:jobId', authMiddleware, async (req, res, next) => {
   try {
     const applications = await applicationService.getApplicationsByJob(req.params.jobId);
@@ -373,7 +320,6 @@ app.get('/applications/job/:jobId', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET /applications/:id – Get application detail
 app.get('/applications/:id', authMiddleware, async (req, res, next) => {
   try {
     const application = await applicationService.getApplicationById(req.params.id);
@@ -383,7 +329,6 @@ app.get('/applications/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// PUT /applications/:id – Update application status
 app.put('/applications/:id', authMiddleware, validationMiddleware(ApplicationStatusSchema), async (req, res, next) => {
   try {
     await applicationService.updateApplicationStatus(req.params.id, req.body);
@@ -393,7 +338,6 @@ app.put('/applications/:id', authMiddleware, validationMiddleware(ApplicationSta
   }
 });
 
-// DELETE /applications/:id – Delete application
 app.delete('/applications/:id', authMiddleware, async (req, res, next) => {
   try {
     await applicationService.deleteApplication(req.params.id);
@@ -403,11 +347,6 @@ app.delete('/applications/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// BOOKMARKS (all protected)
-// ─────────────────────────────────────────────
-
-// POST /jobs/:jobId/bookmark – Create bookmark
 app.post('/jobs/:jobId/bookmark', authMiddleware, async (req, res, next) => {
   try {
     const bookmarkId = await bookmarkService.addBookmark({
@@ -424,7 +363,6 @@ app.post('/jobs/:jobId/bookmark', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET /jobs/:jobId/bookmark/:id – Get bookmark detail
 app.get('/jobs/:jobId/bookmark/:id', authMiddleware, async (req, res, next) => {
   try {
     const bookmark = await bookmarkService.getBookmarkById(req.params.id);
@@ -434,7 +372,6 @@ app.get('/jobs/:jobId/bookmark/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// DELETE /jobs/:jobId/bookmark – Delete bookmark by user and job
 app.delete('/jobs/:jobId/bookmark', authMiddleware, async (req, res, next) => {
   try {
     await bookmarkService.deleteBookmarkByUserAndJob(req.user.id, req.params.jobId);
@@ -444,7 +381,6 @@ app.delete('/jobs/:jobId/bookmark', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET /bookmarks – Get all bookmarks for logged-in user
 app.get('/bookmarks', authMiddleware, async (req, res, next) => {
   try {
     const bookmarks = await bookmarkService.getAllBookmarksByUser(req.user.id);
@@ -454,11 +390,6 @@ app.get('/bookmarks', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// DOCUMENTS
-// ─────────────────────────────────────────────
-
-// GET /documents – Get all documents (public)
 app.get('/documents', async (req, res, next) => {
   try {
     const documents = await documentService.getAllDocuments();
@@ -468,7 +399,6 @@ app.get('/documents', async (req, res, next) => {
   }
 });
 
-// GET /documents/:id – Get document by ID (public)
 app.get('/documents/:id', async (req, res, next) => {
   try {
     const document = await documentService.getDocumentById(req.params.id);
@@ -478,7 +408,6 @@ app.get('/documents/:id', async (req, res, next) => {
   }
 });
 
-// POST /documents – Upload document (protected)
 app.post('/documents', authMiddleware, upload.single('document'), async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ status: 'fail', message: 'File tidak ditemukan' });
@@ -502,7 +431,6 @@ app.post('/documents', authMiddleware, upload.single('document'), async (req, re
   }
 });
 
-// DELETE /documents/:id – Delete document (protected)
 app.delete('/documents/:id', authMiddleware, async (req, res, next) => {
   try {
     await documentService.deleteDocument(req.params.id, req.user.id);
@@ -512,11 +440,6 @@ app.delete('/documents/:id', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// PROFILE (protected)
-// ─────────────────────────────────────────────
-
-// GET /profile – Get logged-in user profile
 app.get('/profile', authMiddleware, async (req, res, next) => {
   try {
     const query = {
@@ -531,7 +454,6 @@ app.get('/profile', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET /profile/applications – Get my applications
 app.get('/profile/applications', authMiddleware, async (req, res, next) => {
   try {
     const applications = await applicationService.getApplicationsByUser(req.user.id);
@@ -541,7 +463,6 @@ app.get('/profile/applications', authMiddleware, async (req, res, next) => {
   }
 });
 
-// GET /profile/bookmarks – Get my bookmarks
 app.get('/profile/bookmarks', authMiddleware, async (req, res, next) => {
   try {
     const bookmarks = await bookmarkService.getAllBookmarksByUser(req.user.id);
@@ -551,9 +472,6 @@ app.get('/profile/bookmarks', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// GLOBAL ERROR HANDLER
-// ─────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err.stack);
   const statusCode = err.statusCode || 500;
