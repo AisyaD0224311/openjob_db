@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
 
     if (!token) {
         return res.status(401).json({
-            status: 'fail',
+            status: 'failed',
             message: 'Akses ditolak, token tidak ada',
         });
     }
@@ -19,7 +19,7 @@ const authMiddleware = (req, res, next) => {
     } catch (error) {
         console.log("Detail Error JWT:", error.message); 
         res.status(403).json({
-            status: 'fail',
+            status: 'failed',
             message: 'Token tidak valid atau sudah kadaluarsa',
         });
     }

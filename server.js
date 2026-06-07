@@ -34,7 +34,7 @@ app.post('/users', validationMiddleware(UserPayloadSchema), async (req, res, nex
     res.status(201).json({
       status: 'success',
       message: 'User berhasil ditambahkan',
-      data: { userId },
+      data: { id : userId },
     });
   } catch (error) {
     next(error);
@@ -53,7 +53,7 @@ app.get('/users/:id', async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
-    res.status(200).json({ status: 'success', data: { user: result.rows[0] } });
+    res.status(200).json({ status: 'success', data: result.rows[0] });
   } catch (error) {
     next(error);
   }
@@ -97,7 +97,7 @@ app.put('/authentications', async (req, res, next) => {
     res.status(200).json({ status: 'success', data: { accessToken: newAccessToken } });
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-      return res.status(400).json({ status: 'fail', message: 'Refresh token tidak valid' });
+      return res.status(400).json({ status: 'failed', message: 'Refresh token tidak valid' });
     }
     next(error);
   }
@@ -410,7 +410,7 @@ app.get('/documents/:id', async (req, res, next) => {
 
 app.post('/documents', authMiddleware, upload.single('document'), async (req, res, next) => {
   try {
-    if (!req.file) return res.status(400).json({ status: 'fail', message: 'File tidak ditemukan' });
+    if (!req.file) return res.status(400).json({ status: 'failed', message: 'File tidak ditemukan' });
 
     const id = `doc-${nanoid(16)}`;
     const userId = req.user.id;
@@ -477,7 +477,7 @@ app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Terjadi kegagalan pada server kami';
   res.status(statusCode).json({
-    status: statusCode >= 500 ? 'error' : 'fail',
+    status: statusCode >= 500 ? 'error' : 'failed',
     message,
   });
 });
